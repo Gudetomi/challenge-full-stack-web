@@ -19,12 +19,15 @@
     "@types/node": "25.0.10",
     "eslint": "9.39.2",
     "eslint-plugin-import-helpers": "2.0.1",
+    "prisma": "7.3.0",
     "tsup": "8.5.1",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
     "typescript-eslint": "8.54.0"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "7.3.0",
+    "@prisma/client": "7.3.0",
     "dotenv": "17.2.3",
     "fastify": "5.7.2",
     "zod": "4.3.6"
