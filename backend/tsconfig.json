@@ -6,6 +6,12 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@prisma/client": [
+        "./prisma/generated/prisma"
+      ],
+      "@prisma/client/*": [
+        "./prisma/generated/prisma/*"
       ]
     },
     // "rootDir": "./src",
