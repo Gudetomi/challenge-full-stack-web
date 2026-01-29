@@ -1,14 +1,20 @@
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository';
 import { compare } from 'bcryptjs';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { UserAlreadyExistsError } from './errors/user/user-already-exists-error';
 import { RegisterService } from './register';
 
-describe('Register Use Case', () => {
+let usersRepository: InMemoryUsersRepository
+let sut: RegisterService
+
+describe('Register Service', () => {
+  beforeEach(()=>{
+    usersRepository = new InMemoryUsersRepository
+    sut = new RegisterService(usersRepository)
+  })
   it('should be able to register', async () => {
-    const usersRepository = new InMemoryUsersRepository
-    const registerService = new RegisterService(usersRepository)
-    const { user } = await registerService.execute({
+
+    const { user } = await sut.execute({
       name: 'John Doe',
       email: 'john.doe@example.com',
       password: '12345678',
@@ -16,9 +22,7 @@ describe('Register Use Case', () => {
     expect(user.id).toEqual(expect.any(String))
   })
   it('should hash user password upon registration', async () => {
-    const usersRepository = new InMemoryUsersRepository
-    const registerService = new RegisterService(usersRepository)
-    const { user } = await registerService.execute({
+    const { user } = await sut.execute({
       name: 'John Doe',
       email: 'john.doe@example.com',
       password: '12345678',
@@ -27,18 +31,15 @@ describe('Register Use Case', () => {
     expect(isPasswordHashed).toBe(true)
   })
   it('should not be able to register with same email twice', async () => {
-    const usersRepository = new InMemoryUsersRepository
-    const registerService = new RegisterService(usersRepository)
-
     const email = 'john.doe@example.com'
-    await registerService.execute({
+    await sut.execute({
       name: 'John Doe',
       email: email,
       password: '12345678',
     })
 
     await expect(() =>
-       registerService.execute({
+      sut.execute({
         name: 'John Doe',
         email: email,
         password: '12345678',
