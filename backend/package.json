@@ -8,7 +8,10 @@
     "start:dev": "tsx watch src/server.ts",
     "start": "node build/server.js",
     "build": "tsup src --out-dir build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +22,8 @@
     "@types/bcryptjs": "3.0.0",
     "@types/node": "25.0.10",
     "@types/pg": "8.16.0",
+    "@vitest/coverage-v8": "4.0.18",
+    "@vitest/ui": "4.0.18",
     "eslint": "9.39.2",
     "eslint-plugin-import-helpers": "2.0.1",
     "prisma": "7.3.0",
