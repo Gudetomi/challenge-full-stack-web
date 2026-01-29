@@ -1,8 +1,8 @@
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository';
 import { hash } from 'bcryptjs';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ResourceNotFoundError } from './errors/user/resource-not-found-error';
-import { GetUserProfileService } from './get-user-profile';
+import { ResourceNotFoundError } from '../errors/resource-not-found-error';
+import { GetUserProfileService } from '../get-user-profile';
 
 let usersRepository: InMemoryUsersRepository
 let sut: GetUserProfileService
@@ -28,6 +28,6 @@ describe('Get User Profile Service', () => {
 
     await expect(() => sut.execute({
       userId: 'non-existing-id',
-    })).rejects.toBeInstanceOf(ResourceNotFoundError  )
+    })).rejects.toBeInstanceOf(ResourceNotFoundError)
   })
 })

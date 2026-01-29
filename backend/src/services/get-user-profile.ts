@@ -1,6 +1,6 @@
 import type { UsersRepository } from "@/repositories/user-repository";
 import type { User } from 'prisma/generated/prisma/client';
-import { ResourceNotFoundError } from "./errors/user/resource-not-found-error";
+import { ResourceNotFoundError } from "./errors/resource-not-found-error";
 interface GetUserProfileServiceRequest{
   userId: string;
 }

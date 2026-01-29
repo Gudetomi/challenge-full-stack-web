@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma, type Student } from 'prisma/generated/prisma/client';
 import type { StudentsRepository } from "../student-repository";
 
-export class PrismaStudentRepository implements StudentsRepository {
+export class PrismaStudentsRepository implements StudentsRepository {
   async create(data: Prisma.StudentUncheckedCreateInput) {
     const student = await prisma.student.create({
       data,
@@ -12,7 +12,11 @@ export class PrismaStudentRepository implements StudentsRepository {
   async save(data: Student) {
     const student = await prisma.student.update({
       where: { id: data.id },
-      data: data,
+      data: {
+        name: data.name,
+        email: data.email,
+        user_id: data.user_id,
+      },
     });
     return student;
   }
