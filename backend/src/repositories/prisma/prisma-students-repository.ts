@@ -34,5 +34,9 @@ export class PrismaStudentRepository implements StudentsRepository {
     });
     return students;
   }
-  
+  async delete(id: string) {
+    await prisma.student.delete({
+      where: { id },
+    });
+  }
 }
