@@ -18,9 +18,11 @@ export class CreateStudentService {
   constructor(private studentRepository: StudentsRepository){}
 
   async execute({ name, email, ra, cpf , userId}: StudentServiceRequest): Promise<StudentServiceResponse>{
-    const studentAlreadyExists = await this.studentRepository.findByEmail(email)
+    const emailAlreadyExists = await this.studentRepository.findByEmail(email)
+    const cpfAlreadyExists = await this.studentRepository.findByCpf(cpf)
+    const raAlreadyExists = await this.studentRepository.findByRa(ra)
 
-    if(studentAlreadyExists){
+    if(emailAlreadyExists || cpfAlreadyExists || raAlreadyExists){
       throw new StudentAlreadyExistsError()
     }
 

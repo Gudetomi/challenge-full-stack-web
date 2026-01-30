@@ -1,6 +1,6 @@
 import { InMemoryStudentsRepository } from '@/repositories/in-memory/in-memory-students-repository'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { SearchStudentsService } from './search-students'
+import { SearchStudentsService } from '../search-students'
 
 let studentsRepository: InMemoryStudentsRepository
 let sut: SearchStudentsService

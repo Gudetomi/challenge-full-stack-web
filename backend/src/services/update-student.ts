@@ -3,9 +3,9 @@ import type { Student } from 'prisma/generated/prisma/client'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface UpdateStudentServiceRequest {
-  studentId: string
-  name: string
-  email: string
+  id: string
+  name?: string | undefined
+  email?: string | undefined
   userId: string
 }
 
@@ -16,19 +16,21 @@ interface UpdateStudentServiceResponse {
 export class UpdateStudentService {
   constructor(private studentsRepository: StudentsRepository) {}
 
-  async execute({studentId,name,email,userId,}: UpdateStudentServiceRequest): Promise<UpdateStudentServiceResponse> {
-    const student = await this.studentsRepository.findById(studentId)
+  async execute({id,name,email,userId,}: UpdateStudentServiceRequest): Promise<UpdateStudentServiceResponse> {
+    const student = await this.studentsRepository.findById(id)
 
     if (!student) {
       throw new ResourceNotFoundError()
     }
-
-    const updatedStudent = await this.studentsRepository.save({
+    
+    const studentToUpdate = {
       ...student,
-      name,
-      email,
+      name: name ?? student.name,
+      email: email ?? student.email,
       user_id: userId,
-    })
+    }
+
+    const updatedStudent = await this.studentsRepository.save(studentToUpdate)
 
     return {
       student: updatedStudent,

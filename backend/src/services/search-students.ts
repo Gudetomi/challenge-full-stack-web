@@ -2,7 +2,7 @@ import type { StudentsRepository } from "@/repositories/student-repository";
 import type { Student } from 'prisma/generated/prisma/client';
 
 interface SearchStudentServiceRequest{
-  query: string;
+  query?: string | undefined;
   page: number;
 }
 
