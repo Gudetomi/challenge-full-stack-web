@@ -1,5 +1,6 @@
 import { StudentAlreadyExistsError } from '@/services/errors/student/student-already-exists-error';
 import { makeCreateStudentService } from '@/services/factories/make-create-student-service';
+import { validateCPF } from '@/utils/validate-cpf';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
@@ -8,7 +9,10 @@ export async function create(request: FastifyRequest, reply: FastifyReply){
       name: z.string(),
       email: z.string().email(),
       ra: z.string().min(6),
-      cpf: z.string().min(11),
+      cpf: z.string()
+      .transform(val => val.replace(/\D/g, ''))
+      .refine(val => val.length === 11, 'CPF deve ter 11 dígitos')
+      .refine(validateCPF, 'CPF inválido'),
       userId: z.string(),
   })
 
