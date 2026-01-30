@@ -5,19 +5,22 @@ on:
     branches: [ master ]
     paths:
       - 'backend/**'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'backend/**'
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
 
-    # Configura o PostgreSQL como um serviço do Docker para o ambiente do GitHub
     services:
       postgres:
-        image: bitnami/postgresql:latest
+        image: postgres:15
         env:
-          POSTGRESQL_USERNAME: user_test
-          POSTGRESQL_PASSWORD: password_test
-          POSTGRESQL_DATABASE: db_test
+          POSTGRES_USER: user_test
+          POSTGRES_PASSWORD: password_test
+          POSTGRES_DB: db_test
         ports:
           - 5432:5432
         options: >-
@@ -30,15 +33,15 @@ jobs:
       run:
         working-directory: ./backend
 
-    # Variáveis de ambiente que o seu app/prisma usará durante os testes no CI
     env:
       DATABASE_URL: "postgresql://user_test:password_test@localhost:5432/db_test?schema=public"
       JWT_SECRET: "test-secret-only-for-ci"
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
