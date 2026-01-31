@@ -5,23 +5,24 @@
     class="d-flex align-center justify-center login-container"
   >
     <v-card class="login-card" elevation="8" width="100%" max-width="400">
-    <v-card-item class="pt-8">
-      <div class="text-center mb-4">
-        <div class="d-flex justify-center mb-4">
+      <v-card-item class="pt-8">
+        <div class="text-center mb-4">
+          <div class="d-flex justify-center mb-4">
             <v-img
-            height="120"
-            aspect-ratio="16/9"
-            contain
-            src="src/assets/logo-mais-a-educacao.svg"
-            class="mx-auto mb-4"
+              height="120"
+              aspect-ratio="16/9"
+              contain
+              src="src/assets/logo-mais-a-educacao.svg"
+              class="mx-auto mb-4"
             />
+          </div>
+
+          <h1 class="text-h4 font-weight-bold mb-2">Alunos Manager</h1>
+          <p class="text-subtitle2 text-gray-600">
+            Gerenciar alunos de forma simples e eficiente
+          </p>
         </div>
-        <h1 class="text-h4 font-weight-bold mb-2">Alunos Manager</h1>
-        <p class="text-subtitle2 text-gray-600">
-          Gerenciar alunos de forma simples e eficiente
-        </p>
-      </div>
-    </v-card-item>
+      </v-card-item>
 
       <v-card-text>
         <v-form @submit.prevent="handleLogin">
@@ -36,8 +37,8 @@
             :error="!!errors.email"
             :error-messages="errors.email ? [errors.email] : []"
             @blur="validateEmail"
-            required
-          ></v-text-field>
+          />
+
           <v-text-field
             v-model="password"
             label="Senha"
@@ -51,8 +52,8 @@
             :error-messages="errors.password ? [errors.password] : []"
             @blur="validatePassword"
             @click:append-inner="showPassword = !showPassword"
-            required
-          ></v-text-field>
+          />
+
           <v-btn
             block
             size="large"
@@ -64,6 +65,7 @@
           >
             Entrar
           </v-btn>
+
           <v-alert
             v-if="errorMessage"
             type="error"
@@ -75,6 +77,7 @@
             {{ errorMessage }}
           </v-alert>
         </v-form>
+
         <div class="text-center">
           <p class="text-subtitle2 mb-0">
             Não tem conta?
@@ -88,61 +91,39 @@
   </v-container>
 </template>
 
+
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import { useUserLogin } from '@/composables/userLogin'
+import { useUserValidation } from '@/composables/useUserValidation'
+import { computed, ref } from 'vue'
+
 const email = ref('')
 const password = ref('')
-const showPassword = ref(false)          
-const loading = ref(false)              
-const errorMessage = ref('')             
+const showPassword = ref(false)
+const { errors, validateEmail:validateEmailFn, validatePassword } = useUserValidation()
+const { login, loading, error: errorMessage } = useUserLogin()
 
-const errors = reactive<{ email?: string; password?: string }>({})
 const isFormValid = computed(() => {
-  return email.value && password.value && !errors.email && !errors.password
+  return (
+    email.value &&
+    password.value &&
+    !errors.email &&
+    !errors.password
+  )
 })
-
 function validateEmail() {
-  if (!email.value) {
-    errors.email = 'Email é obrigatório'
-  } else if (!email.value.includes('@')) {
-    errors.email = 'Email inválido'
-  } else {
-    errors.email = ''
-  }
+  errors.email = validateEmailFn(email.value)
 }
-
-function validatePassword() {
-  if (!password.value) {
-    errors.password = 'Senha é obrigatória'
-  } else if (password.value.length < 6) {
-    errors.password = 'Senha deve ter pelo menos 6 caracteres'
-  } else {
-    errors.password = ''
-  }
-}
-
 async function handleLogin() {
   validateEmail()
-  validatePassword()
+  validatePassword(password.value)
 
   if (!isFormValid.value) return
 
-  loading.value = true
-  errorMessage.value = ''
-
-  try {
-    // TODO: Chamar API de login aqui
-    // Por enquanto, vamos simular login bem-sucedido
-    console.log('Login com:', { email: email.value, password: password.value })
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    await router.push('/')
-  } catch (error: any) {
-    errorMessage.value = error.message || 'Erro ao fazer login'
-  } finally {
-    loading.value = false
-  }
+  await login({
+    email: email.value,
+    password: password.value,
+  })
 }
 </script>
 

@@ -5,6 +5,7 @@ interface User {
   id: string
   name: string
   email: string
+  role?:string
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -13,6 +14,10 @@ export const useAuthStore = defineStore('auth', {
     user: null as User | null,
     isRefreshing: false,
   }),
+  getters: {
+    isAuthenticated: (state) => !!state.token,
+    isAdmin: (state) => state.user?.role === 'ADMIN',
+  },
 
   actions: {
     setAuth(token: string, user?: User) {
@@ -26,7 +31,16 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       localStorage.removeItem('token')
     },
+    async loadUser() {
+      if (!this.token) return
 
+      try {
+        const { data } = await userService.getProfile()
+        this.user = data.user || data
+      } catch {
+        this.clearAuth()
+      }
+    },
     async refreshToken() {
       if (this.isRefreshing) return
 

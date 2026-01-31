@@ -1,3 +1,4 @@
+import { useUserValidation } from '@/composables/useUserValidation'
 import { userService } from '@/services/user'
 import { useAuthStore } from '@/stores/auth'
 import { computed, reactive, ref } from 'vue'
@@ -17,7 +18,11 @@ export function useRegister() {
   const showPassword = ref(false)
   const loading = ref(false)
   const errorMessage = ref('')
-
+  const {
+    errors: baseErrors,
+    validateEmail,
+    validatePassword,
+  } = useUserValidation()
   const errors = reactive<{
     name?: string
     email?: string
@@ -25,6 +30,10 @@ export function useRegister() {
     confirmPassword?: string
   }>({})
 
+  const syncErrors = () => {
+    errors.email = baseErrors.email
+    errors.password = baseErrors.password
+  }
   const passwordStrength = computed(() => {
     let strength = 0
     if (form.password.length >= 8) strength += 25
@@ -57,21 +66,7 @@ export function useRegister() {
     if (!form.name) errors.name = 'Nome é obrigatório'
     else if (form.name.length < 3)
       errors.name = 'Nome deve ter pelo menos 3 caracteres'
-    else errors.name = ''
-  }
-
-  function validateEmail() {
-    if (!form.email) errors.email = 'Email é obrigatório'
-    else if (!form.email.includes('@'))
-      errors.email = 'Email inválido'
-    else errors.email = ''
-  }
-
-  function validatePassword() {
-    if (!form.password) errors.password = 'Senha é obrigatória'
-    else if (form.password.length < 6)
-      errors.password = 'Senha deve ter pelo menos 6 caracteres'
-    else errors.password = ''
+    else errors.name = undefined
   }
 
   function validateConfirmPassword() {
@@ -79,14 +74,16 @@ export function useRegister() {
       errors.confirmPassword = 'Confirmação é obrigatória'
     else if (form.confirmPassword !== form.password)
       errors.confirmPassword = 'As senhas não correspondem'
-    else errors.confirmPassword = ''
+    else errors.confirmPassword = undefined
   }
 
   async function handleRegister() {
     validateName()
-    validateEmail()
-    validatePassword()
+
+    validateEmail(form.email)
+    validatePassword(form.password)
     validateConfirmPassword()
+    syncErrors()
 
     if (!isFormValid.value) return
 
@@ -106,7 +103,7 @@ export function useRegister() {
       })
 
       auth.setAuth(data.token, data.user)
-      await router.push('/dashboard')
+      await router.push('/')
     } catch (error: any) {
       errorMessage.value =
         error.response?.data?.message ||
@@ -126,8 +123,14 @@ export function useRegister() {
     passwordStrengthColor,
     isFormValid,
     validateName,
-    validateEmail,
-    validatePassword,
+    validateEmail: () => {
+      validateEmail(form.email)
+      syncErrors()
+    },
+    validatePassword: () => {
+      validatePassword(form.password)
+      syncErrors()
+    },
     validateConfirmPassword,
     handleRegister,
   }
