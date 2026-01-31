@@ -1,6 +1,7 @@
 import { studentRoutes } from '@/http/controllers/students/routes';
 import { userRoutes } from '@/http/controllers/users/routes';
 import fastifyCookie from '@fastify/cookie';
+import fastifyCors from '@fastify/cors';
 import fastifyJwt from '@fastify/jwt';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
@@ -9,7 +10,16 @@ import { ZodError } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { env } from './env';
 
+
+
 export const app = fastify()
+app.register(fastifyCookie)
+
+app.register(fastifyCors, {
+  origin: [env.FRONTEND_URL],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+})
 
 app.register(fastifyJwt,{
   secret:env.JWT_SECRET,
@@ -22,7 +32,7 @@ app.register(fastifyJwt,{
   },
 })
 
-app.register(fastifyCookie)
+
 app.register(fastifySwagger, {
   openapi: {
     info: {
