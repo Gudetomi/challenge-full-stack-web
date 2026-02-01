@@ -63,36 +63,18 @@
     </v-row>
     <v-dialog v-model="dialogOpen" width="500px">
       <v-card>
-        <v-card-title class="text-h6 font-weight-bold">
-          {{ editingStudent ? 'Editar Aluno' : 'Novo Aluno' }}
-        </v-card-title>
-        <v-divider></v-divider>
-        <v-card-text class="py-6">
-          <v-form @submit.prevent="handleSubmit">
-            <v-text-field v-model="form.name" label="Nome" variant="outlined" density="comfortable" class="mb-4"
-              :error="!!formErrors.name" :error-messages="formErrors.name ? [formErrors.name] : []" @blur="validateName"
-              required></v-text-field>
-            <v-text-field v-model="form.email" label="Email" type="email" variant="outlined" density="comfortable"
-              class="mb-4" :error="!!formErrors.email" :error-messages="formErrors.email ? [formErrors.email] : []"
-              @blur="validateEmail" required></v-text-field>
-            <v-text-field v-model="form.ra" label="RA (Número de Matrícula)" variant="outlined" density="comfortable"
-              class="mb-4" :error="!!formErrors.ra" :error-messages="formErrors.ra ? [formErrors.ra] : []"
-              @blur="validateRA" required></v-text-field>
-            <v-text-field v-model="form.cpf" label="CPF" variant="outlined" density="comfortable" class="mb-4"
-              :error="!!formErrors.cpf" :error-messages="formErrors.cpf ? [formErrors.cpf] : []" @blur="validateCPF"
-              placeholder="00000000000" required></v-text-field>
-            <v-alert v-if="submitError" type="error" variant="tonal" class="mb-4" closable
-              @click:close="submitError = ''">
-              {{ submitError }}
-            </v-alert>
-          </v-form>
+        <v-card-title>{{ editingStudent ? 'Editar Aluno' : 'Novo Aluno' }}</v-card-title>
+        <v-card-text>
+          <StudentForm 
+            :initialData="editingStudent" 
+            @update:modelValue="handleFormUpdate"
+          />
+          
+          <v-alert v-if="submitError" type="error" class="mt-4">{{ submitError }}</v-alert>
         </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions class="pa-4">
+        <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="tonal" @click="closeDialog" :disabled="loadingSubmit">
-            Cancelar
-          </v-btn>
+          <v-btn @click="closeDialog">Cancelar</v-btn>
           <v-btn color="primary" @click="handleSubmit" :loading="loadingSubmit" :disabled="!isFormValid">
             {{ editingStudent ? 'Atualizar' : 'Criar' }}
           </v-btn>
@@ -129,6 +111,7 @@
 
 <script setup lang="ts">
 import '@/assets/styles/StudentPage.scss';
+import StudentForm from '@/components/StudentForm.vue';
 import { useStudents } from '@/composables/useStudents';
 const {
   studentStore,
@@ -140,13 +123,8 @@ const {
   studentToDelete,
   loadingSubmit,
   submitError,
-  form,
-  formErrors,
-  isFormValid,
-  validateName,
-  validateEmail,
-  validateRA,
-  validateCPF,
+  isFormValid,        
+  handleFormUpdate,
   openCreateDialog,
   openEditDialog,
   closeDialog,
