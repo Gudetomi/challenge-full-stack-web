@@ -648,3 +648,20 @@ docker-compose up -d
 - ✅ Migrations com Prisma
 - ✅ Seed de dados
 - ✅ Variáveis de ambiente validadas
+
+## 🚀 Melhorias Futuras (Roadmap)
+
+Se houvesse mais tempo para o desenvolvimento, as seguintes melhorias seriam implementadas para elevar o nível de maturidade e escalabilidade da aplicação:
+
+### 1. **Observabilidade e Logs**
+- Integração com **Sentry** para rastreamento de exceções e performance.
+
+### 2. **Performance e Cache**
+- Implementação de cache com **Redis** na listagem de alunos para reduzir a latência e o consumo de recursos do PostgreSQL em rotas de alta leitura.
+
+### 3. **Segurança Avançada**
+- **2FA:** Autenticação de dois fatores para usuários com perfil `ADMIN`.
+
+### 5. **Frontend (UX/UI)**
+- **Skeleton Loaders:** Para uma transição de carregamento mais fluida na tabela de alunos.
+- **Testes de Componentes:** Cobertura de testes unitários e de integração no frontend com **Vitest** e **Vue Test Utils**.
