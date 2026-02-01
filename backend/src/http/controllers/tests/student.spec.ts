@@ -29,7 +29,7 @@ describe('Students (e2e)', () => {
         name: 'Gustavo Student',
         email: 'gustavo@student.com',
         ra: 'RA123456',
-        cpf: '12345678901',
+        cpf: '09979776633',
         userId: user.id,
       })
 

@@ -65,7 +65,7 @@ describe('Search Students Use Case', () => {
     }
     const { students } = await sut.execute({
       query: 'JavaScript',
-      page: 2,
+      page: 3,
     })
     expect(students).toHaveLength(2)
     expect(students).toEqual([
