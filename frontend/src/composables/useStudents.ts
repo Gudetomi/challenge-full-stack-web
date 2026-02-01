@@ -4,6 +4,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 
 export function useStudents() {
   const studentStore = useStudentStore()
+  const searchInput = ref('') 
   const dialogOpen = ref(false)
   const deleteDialogOpen = ref(false)
   const editingStudent = ref<any>(null)
@@ -16,7 +17,6 @@ export function useStudents() {
     email: '',
     ra: '',
     cpf: '',
-    userId: ''
   })
 
   const formErrors = reactive<{
@@ -124,58 +124,48 @@ export function useStudents() {
 
   async function handleSubmit() {
     validateForm()
-
+  
     if (!isFormValid.value) return
-
+  
     loadingSubmit.value = true
     submitError.value = ''
-
+  
     try {
       if (editingStudent.value) {
-        await studentStore.updateStudent(editingStudent.value.id, {
-          name: form.name,
-          email: form.email,
-          ra: form.ra,
-          cpf: form.cpf,
-        })
+        await studentStore.updateStudent(editingStudent.value.id, { ...form })
       } else {
-        await studentStore.createStudent({
-          name: form.name,
-          email: form.email,
-          ra: form.ra,
-          cpf: form.cpf
-        })
+        await studentStore.createStudent({ ...form })
       }
       closeDialog()
+      await studentStore.fetchStudents(studentStore.currentPage)
     } catch (error: any) {
       submitError.value = error.message || 'Erro ao salvar aluno'
     } finally {
       loadingSubmit.value = false
     }
   }
-
   async function handleDelete() {
     if (!studentToDelete.value) return
-
     loadingSubmit.value = true
-
     try {
       await studentStore.deleteStudent(studentToDelete.value.id)
       deleteDialogOpen.value = false
+      await studentStore.fetchStudents(studentStore.currentPage)
     } catch (error: any) {
       console.error('Erro ao deletar:', error)
     } finally {
       loadingSubmit.value = false
     }
   }
-
-  function handleSearch(query: string) {
-    studentStore.searchStudents(query)
+  function handleSearch() {
+    studentStore.currentPage = 1
+    studentStore.fetchStudents(1, searchInput.value)
   }
-
   function handlePageChange(page: number) {
-    studentStore.goToPage(page)
+    studentStore.currentPage = page
+    studentStore.fetchStudents(page, searchInput.value)
   }
+  
 
   onMounted(async () => {
     await studentStore.fetchStudents()
@@ -183,6 +173,7 @@ export function useStudents() {
 
   return {
     studentStore,
+    searchInput,
     dialogOpen,
     deleteDialogOpen,
     editingStudent,

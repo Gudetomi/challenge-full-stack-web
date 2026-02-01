@@ -12,7 +12,6 @@ export interface Student {
 }
 
 export interface CreateStudentPayload {
-  userId: string
   name: string
   email: string
   ra: string
@@ -24,7 +23,6 @@ export interface UpdateStudentPayload {
   email?: string
   ra?: string
   cpf?: string
-  userId?: string
 }
 
 export interface StudentResponse {

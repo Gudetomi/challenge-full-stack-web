@@ -8,7 +8,7 @@ export const useStudentStore = defineStore('student', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const searchQuery = ref('')
-  
+
   const currentPage = ref(1)
   const pageSize = ref(10)
   const totalStudents = ref(0)
@@ -26,24 +26,18 @@ export const useStudentStore = defineStore('student', () => {
       const response = await studentService.listStudents({
         page: page || currentPage.value,
         limit: pageSize.value,
-        search: search || searchQuery.value,
+        search: search ?? searchQuery.value,
       })
   
       const data = response.data.students
   
-      if (Array.isArray(data)) {
-        students.value = data
-      } else {
-        console.warn('Resposta inesperada:', response.data)
-        students.value = []
-      }
-  
+      students.value = Array.isArray(data) ? data : []
       totalStudents.value = response.data.total ?? students.value.length
       currentPage.value = page || currentPage.value
+      searchQuery.value = search ?? searchQuery.value // mantém o termo de busca atual
   
     } catch (err: any) {
       error.value = err.message || 'Erro ao carregar alunos'
-      console.error('Erro ao carregar alunos:', error.value)
     } finally {
       loading.value = false
     }
@@ -55,16 +49,12 @@ export const useStudentStore = defineStore('student', () => {
     error.value = null
     const authStore = useAuthStore()
     data.userId = authStore.user?.id || ''
-    try {
-      const response = await studentService.createStudent(data)
-      const newStudent = response.data.data || response.data
 
-      students.value.unshift(newStudent)
-      totalStudents.value++
-      return newStudent
+    try {
+      await studentService.createStudent(data)
+      await fetchStudents(currentPage.value, searchQuery.value)
     } catch (err: any) {
       error.value = err.message || 'Erro ao criar aluno'
-      console.error('Erro ao criar aluno:', error.value)
       throw err
     } finally {
       loading.value = false
@@ -76,18 +66,12 @@ export const useStudentStore = defineStore('student', () => {
     error.value = null
     const authStore = useAuthStore()
     data.userId = authStore.user?.id || ''
-    try {
-      const response = await studentService.updateStudent(id, data)
-      const updatedStudent = response.data.data || response.data
 
-      const index = students.value.findIndex((s) => s.id === id)
-      if (index !== -1) {
-        students.value[index] = updatedStudent
-      }
-      return updatedStudent
+    try {
+      await studentService.updateStudent(id, data)
+      await fetchStudents(currentPage.value, searchQuery.value)
     } catch (err: any) {
       error.value = err.message || 'Erro ao atualizar aluno'
-      console.error('Erro ao atualizar aluno:', error.value)
       throw err
     } finally {
       loading.value = false
@@ -97,15 +81,11 @@ export const useStudentStore = defineStore('student', () => {
   async function deleteStudent(id: string) {
     loading.value = true
     error.value = null
-
     try {
       await studentService.deleteStudent(id)
-      students.value = students.value.filter((s) => s.id !== id)
-      totalStudents.value--
-
+      await fetchStudents(currentPage.value, searchQuery.value)
     } catch (err: any) {
       error.value = err.message || 'Erro ao deletar aluno'
-      console.error('Erro ao deletar aluno:', error.value)
       throw err
     } finally {
       loading.value = false
@@ -144,12 +124,12 @@ export const useStudentStore = defineStore('student', () => {
     currentPage,
     pageSize,
     totalStudents,
-    
+
     isLoading,
     hasError,
     errorMessage,
     totalPages,
-  
+
     fetchStudents,
     createStudent,
     updateStudent,

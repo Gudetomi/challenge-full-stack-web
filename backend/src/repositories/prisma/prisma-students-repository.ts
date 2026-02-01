@@ -22,7 +22,7 @@ export class PrismaStudentsRepository implements StudentsRepository {
   }
   async searchMany(page: number, query?: string) {
     const where: Prisma.StudentWhereInput = {}
-
+    console.log(query)
     if (query) {
       const sanitizedQuery = query.replace(/[.-]/g, '')
       where.OR = [

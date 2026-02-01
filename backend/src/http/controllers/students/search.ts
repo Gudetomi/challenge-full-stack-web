@@ -13,7 +13,6 @@ export async function search(request: FastifyRequest, reply: FastifyReply) {
     query,
     page,
   })
-
   return reply.status(200).send({
     students,
     total,

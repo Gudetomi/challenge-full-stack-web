@@ -64,19 +64,22 @@ export class InMemoryStudentsRepository implements StudentsRepository {
 
     return updatedStudent;
   }
-  async searchMany(page: number, query?: string) {
-    return this.items
-      .filter((item) => {
-        if (!query) return true;
+  async searchMany(page: number, query?: string): Promise<{ students: Student[], total: number }> {
+    const filtered = query
+      ? this.items.filter((s) =>
+          s.name.toLowerCase().includes(query.toLowerCase())
+        )
+      : [...this.items]
 
-        const lowerCaseQuery = query.toLowerCase();
-        return (
-          item.name.toLowerCase().includes(lowerCaseQuery) ||
-          item.cpf.includes(lowerCaseQuery) ||
-          item.ra.includes(lowerCaseQuery)
-        );
-      })
-      .slice((page - 1) * 20, page * 20);
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const end = start + pageSize
+    const students = filtered.slice(start, end)
+
+    return {
+      students,
+      total: filtered.length
+    }
   }
   async delete(id: string): Promise<void> {
     const studentIndex = this.items.findIndex((item) => item.id === id);
