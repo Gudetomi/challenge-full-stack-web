@@ -31,15 +31,17 @@ export class PrismaStudentsRepository implements StudentsRepository {
         { ra: { contains: sanitizedQuery } },
       ]
     }
-    const students = await prisma.student.findMany({
-      where,
-      take: 20,
-      skip: (page - 1) * 20,
-      orderBy: {
-        name: 'asc',
-      },
-    });
-    return students;
+    
+    const [students, total] = await prisma.$transaction([
+      prisma.student.findMany({
+        where,
+        take: 20,
+        skip: (page - 1) * 20,
+        orderBy: { name: 'asc' },
+      }),
+      prisma.student.count({ where })
+    ])
+    return { students, total }
   }
   async delete(id: string) {
     await prisma.student.delete({

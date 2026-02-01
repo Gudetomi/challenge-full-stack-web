@@ -7,7 +7,7 @@
         <div class="d-flex align-center justify-space-between">
           <!-- Título -->
           <h1 class="text-h4 font-weight-bold">Gerenciar Alunos</h1>
-          
+
           <!-- Botão para criar novo aluno -->
           <v-btn
             color="primary"
@@ -15,6 +15,7 @@
             @click="openCreateDialog"
             size="large"
             class="text-none"
+            :disabled="studentStore.loading"
           >
             Novo Aluno
           </v-btn>
@@ -26,7 +27,6 @@
     <v-row class="mb-6">
       <v-col cols="12" md="6">
         <v-text-field
-          v-model="searchQuery"
           label="Buscar aluno..."
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
@@ -37,16 +37,37 @@
       </v-col>
     </v-row>
 
+    <!-- Mensagem de erro global -->
+    <v-row v-if="studentStore.hasError" class="mb-6">
+      <v-col cols="12">
+        <v-alert
+          type="error"
+          variant="tonal"
+          closable
+          @click:close="studentStore.clearError"
+        >
+          {{ studentStore.errorMessage }}
+        </v-alert>
+      </v-col>
+    </v-row>
+
     <!-- Tabela de alunos -->
     <v-row>
       <v-col cols="12">
         <v-card elevation="2">
-          <!-- Data Table do Vuetify -->
+          <!-- Loading -->
+          <v-progress-linear
+            v-if="studentStore.isLoading"
+            indeterminate
+            color="primary"
+          ></v-progress-linear>
+
+          <!-- Data Table -->
           <v-data-table
             :headers="headers"
-            :items="students"
-            :loading="loadingTable"
-            :items-per-page="10"
+            :items="studentStore.students"
+            :loading="studentStore.isLoading"
+            :items-per-page="studentStore.pageSize"
             class="students-table"
           >
             <!-- Coluna Email com link -->
@@ -56,7 +77,7 @@
               </a>
             </template>
 
-            <!-- Coluna de Ações (editar/deletar) -->
+            <!-- Coluna de Ações -->
             <template #item.actions="{ item }">
               <div class="d-flex gap-2">
                 <!-- Botão Editar -->
@@ -66,6 +87,7 @@
                   variant="text"
                   color="warning"
                   @click="openEditDialog(item)"
+                  title="Editar aluno"
                 ></v-btn>
 
                 <!-- Botão Deletar -->
@@ -75,38 +97,27 @@
                   variant="text"
                   color="error"
                   @click="openDeleteDialog(item)"
+                  title="Deletar aluno"
                 ></v-btn>
               </div>
             </template>
-
-            <!-- Mensagem de carregamento -->
-            <template #loading>
-              <v-progress-linear
-                indeterminate
-                color="primary"
-              ></v-progress-linear>
-            </template>
           </v-data-table>
 
-          <!-- Mensagem de erro -->
-          <v-alert
-            v-if="errorMessage"
-            type="error"
-            variant="tonal"
-            class="ma-4"
-            closable
-            @click:close="errorMessage = ''"
-          >
-            {{ errorMessage }}
-          </v-alert>
+          <!-- Paginação -->
+          <v-pagination
+            v-model="studentStore.currentPage"
+            :length="studentStore.totalPages"
+            @update:model-value="handlePageChange"
+            class="pa-4"
+          ></v-pagination>
         </v-card>
       </v-col>
     </v-row>
 
-    <!-- DIALOG PARA CRIAR/EDITAR ALUNO -->
+    <!-- DIALOG CRIAR/EDITAR ALUNO -->
     <v-dialog v-model="dialogOpen" width="500px">
       <v-card>
-        <!-- Título do dialog -->
+        <!-- Título -->
         <v-card-title class="text-h6 font-weight-bold">
           {{ editingStudent ? 'Editar Aluno' : 'Novo Aluno' }}
         </v-card-title>
@@ -166,11 +177,11 @@
               :error="!!formErrors.cpf"
               :error-messages="formErrors.cpf ? [formErrors.cpf] : []"
               @blur="validateCPF"
-              placeholder="000.000.000-00"
+              placeholder="00000000000"
               required
             ></v-text-field>
 
-            <!-- Mensagem de erro do submit -->
+            <!-- Erro de submit -->
             <v-alert
               v-if="submitError"
               type="error"
@@ -186,10 +197,10 @@
 
         <v-divider></v-divider>
 
-        <!-- Botões de ação -->
+        <!-- Botões -->
         <v-card-actions class="pa-4">
           <v-spacer></v-spacer>
-          
+
           <v-btn
             variant="tonal"
             @click="closeDialog"
@@ -197,7 +208,7 @@
           >
             Cancelar
           </v-btn>
-          
+
           <v-btn
             color="primary"
             @click="handleSubmit"
@@ -210,7 +221,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- DIALOG PARA CONFIRMAR DELETAR -->
+    <!-- DIALOG CONFIRMAR DELETAR -->
     <v-dialog v-model="deleteDialogOpen" width="400px">
       <v-card>
         <v-card-title class="text-h6 font-weight-bold">
@@ -218,12 +229,10 @@
         </v-card-title>
 
         <v-card-text class="py-6">
-          <!-- Mensagem de confirmação -->
           <p class="mb-4">
             Tem certeza que deseja excluir <strong>{{ studentToDelete?.name }}</strong>?
           </p>
-          
-          <!-- Aviso -->
+
           <p class="text-caption text-gray-600">
             Esta ação não pode ser desfeita.
           </p>
@@ -234,7 +243,7 @@
         <!-- Botões -->
         <v-card-actions class="pa-4">
           <v-spacer></v-spacer>
-          
+
           <v-btn
             variant="tonal"
             @click="deleteDialogOpen = false"
@@ -242,7 +251,7 @@
           >
             Cancelar
           </v-btn>
-          
+
           <v-btn
             color="error"
             @click="handleDelete"
@@ -257,59 +266,35 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { useStudents } from '@/composables/useStudents';
 
 /**
- * INTERFACES/TIPOS
+ * USE COMPOSABLE
  */
-interface Student {
-  id: string
-  name: string
-  email: string
-  ra: string
-  cpf: string
-  createdAt: string
-  updatedAt: string
-}
-
-/**
- * ESTADO DA TABELA
- */
-const students = ref<Student[]>([])
-const loadingTable = ref(false)
-const errorMessage = ref('')
-const searchQuery = ref('')
-
-/**
- * ESTADO DO DIALOG
- */
-const dialogOpen = ref(false)
-const deleteDialogOpen = ref(false)
-const loadingSubmit = ref(false)
-const submitError = ref('')
-
-/**
- * DADOS DO FORMULÁRIO
- */
-const form = reactive({
-  name: '',
-  email: '',
-  ra: '',
-  cpf: '',
-})
-
-const formErrors = reactive<{
-  name?: string
-  email?: string
-  ra?: string
-  cpf?: string
-}>({})
-
-/**
- * ESTADO DE EDIÇÃO
- */
-const editingStudent = ref<Student | null>(null)
-const studentToDelete = ref<Student | null>(null)
+const {
+  studentStore,
+  dialogOpen,
+  deleteDialogOpen,
+  editingStudent,
+  studentToDelete,
+  loadingSubmit,
+  submitError,
+  form,
+  formErrors,
+  isFormValid,
+  validateName,
+  validateEmail,
+  validateRA,
+  validateCPF,
+  openCreateDialog,
+  openEditDialog,
+  closeDialog,
+  openDeleteDialog,
+  handleSubmit,
+  handleDelete,
+  handleSearch,
+  handlePageChange,
+} = useStudents()
 
 /**
  * DEFINIÇÃO DE COLUNAS DA TABELA
@@ -321,216 +306,6 @@ const headers = [
   { title: 'CPF', key: 'cpf', width: '15%' },
   { title: 'Ações', key: 'actions', align: 'center', width: '15%', sortable: false },
 ]
-
-/**
- * COMPUTED PROPERTIES
- */
-const isFormValid = computed(() => {
-  return (
-    form.name &&
-    form.email &&
-    form.ra &&
-    form.cpf &&
-    !formErrors.name &&
-    !formErrors.email &&
-    !formErrors.ra &&
-    !formErrors.cpf
-  )
-})
-
-/**
- * MÉTODOS DE VALIDAÇÃO
- */
-function validateName() {
-  if (!form.name) {
-    formErrors.name = 'Nome é obrigatório'
-  } else if (form.name.length < 3) {
-    formErrors.name = 'Nome deve ter pelo menos 3 caracteres'
-  } else {
-    formErrors.name = ''
-  }
-}
-
-function validateEmail() {
-  if (!form.email) {
-    formErrors.email = 'Email é obrigatório'
-  } else if (!form.email.includes('@')) {
-    formErrors.email = 'Email inválido'
-  } else {
-    formErrors.email = ''
-  }
-}
-
-function validateRA() {
-  if (!form.ra) {
-    formErrors.ra = 'RA é obrigatório'
-  } else if (form.ra.length < 3) {
-    formErrors.ra = 'RA deve ter pelo menos 3 caracteres'
-  } else {
-    formErrors.ra = ''
-  }
-}
-
-function validateCPF() {
-  if (!form.cpf) {
-    formErrors.cpf = 'CPF é obrigatório'
-  } else if (form.cpf.length < 11) {
-    formErrors.cpf = 'CPF inválido'
-  } else {
-    formErrors.cpf = ''
-  }
-}
-
-/**
- * MÉTODOS DE DIALOG
- */
-function openCreateDialog() {
-  editingStudent.value = null
-  form.name = ''
-  form.email = ''
-  form.ra = ''
-  form.cpf = ''
-  submitError.value = ''
-  dialogOpen.value = true
-}
-
-function openEditDialog(student: Student) {
-  editingStudent.value = student
-  form.name = student.name
-  form.email = student.email
-  form.ra = student.ra
-  form.cpf = student.cpf
-  submitError.value = ''
-  dialogOpen.value = true
-}
-
-function closeDialog() {
-  dialogOpen.value = false
-  editingStudent.value = null
-}
-
-function openDeleteDialog(student: Student) {
-  studentToDelete.value = student
-  deleteDialogOpen.value = true
-}
-
-/**
- * MÉTODOS DE SUBMIT
- */
-async function handleSubmit() {
-  // Valida campos
-  validateName()
-  validateEmail()
-  validateRA()
-  validateCPF()
-
-  if (!isFormValid.value) return
-
-  loadingSubmit.value = true
-  submitError.value = ''
-
-  try {
-    // TODO: Chamar API para criar/editar aluno
-    console.log('Salvando aluno:', form)
-    
-    // Simula delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Adiciona/atualiza na lista local
-    if (editingStudent.value) {
-      const index = students.value.findIndex(s => s.id === editingStudent.value!.id)
-      if (index !== -1) {
-        students.value[index] = {
-          ...students.value[index],
-          ...form,
-        }
-      }
-    } else {
-      students.value.push({
-        id: Math.random().toString(),
-        ...form,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      })
-    }
-
-    closeDialog()
-  } catch (error: any) {
-    submitError.value = error.message || 'Erro ao salvar aluno'
-  } finally {
-    loadingSubmit.value = false
-  }
-}
-
-async function handleDelete() {
-  if (!studentToDelete.value) return
-
-  loadingSubmit.value = true
-
-  try {
-    // TODO: Chamar API para deletar
-    console.log('Deletando aluno:', studentToDelete.value)
-    
-    // Simula delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Remove da lista
-    students.value = students.value.filter(
-      s => s.id !== studentToDelete.value!.id
-    )
-
-    deleteDialogOpen.value = false
-  } catch (error) {
-    errorMessage.value = 'Erro ao deletar aluno'
-  } finally {
-    loadingSubmit.value = false
-  }
-}
-
-/**
- * BUSCA
- */
-function handleSearch() {
-  // TODO: Fazer requisição à API com search
-  console.log('Buscando por:', searchQuery.value)
-}
-
-/**
- * CARREGAMENTO INICIAL
- */
-onMounted(async () => {
-  // TODO: Carregar lista de alunos da API
-  loadingTable.value = true
-  
-  try {
-    // Simula carregamento
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // Dados simulados
-    students.value = [
-      {
-        id: '1',
-        name: 'João Silva',
-        email: 'joao@example.com',
-        ra: '2024001',
-        cpf: '12345678901',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        name: 'Maria Santos',
-        email: 'maria@example.com',
-        ra: '2024002',
-        cpf: '98765432100',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ]
-  } finally {
-    loadingTable.value = false
-  }
-})
 </script>
 
 <style scoped>
@@ -552,8 +327,6 @@ onMounted(async () => {
 :deep(.v-data-table__tr:hover) {
   background-color: rgba(0, 0, 0, 0.02);
 }
-
-/* Links */
 :deep(a) {
   text-decoration: none;
   transition: all 0.2s ease;
@@ -563,7 +336,6 @@ onMounted(async () => {
   text-decoration: underline;
 }
 
-/* Gap helper */
 .gap-2 {
   gap: 8px;
 }

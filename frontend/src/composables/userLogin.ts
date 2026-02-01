@@ -68,10 +68,6 @@ export function useUserLogin() {
     try {
       const response = await userService.getProfile()
       const userData = response.data.user || response.data
-
-      console.log('Response do getProfile:', response.data)
-      console.log('User extraído:', userData)
-
       user.value = userData
     } catch (err) {
       console.error('Erro ao carregar perfil:', err)

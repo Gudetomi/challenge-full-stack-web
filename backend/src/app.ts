@@ -19,6 +19,7 @@ app.register(fastifyCors, {
   origin: [env.FRONTEND_URL],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
 })
 
 app.register(fastifyJwt,{

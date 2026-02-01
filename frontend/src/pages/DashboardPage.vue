@@ -3,52 +3,11 @@
     <v-row>
       <v-col cols="12">
         <h1 class="text-h4 font-weight-bold mb-8">
-          Bem-vindo! 👋
+          Bem-vindo! {{ userName }}
         </h1>
       </v-col>
     </v-row>
     <v-row>
-      <!-- Card 1: Total de Alunos -->
-      <v-col cols="12" sm="6" md="3">
-        <v-card elevation="2" class="dashboard-card">
-          <v-card-item>
-            <!-- Avatar com ícone -->
-            <template #prepend>
-              <v-avatar color="primary" size="48">
-                <v-icon icon="mdi-account-multiple"></v-icon>
-              </v-avatar>
-            </template>
-
-            <!-- Título do card -->
-            <v-card-title>Alunos Totais</v-card-title>
-            
-            <!-- Valor grande -->
-            <v-card-subtitle class="text-h5 font-weight-bold text-primary">
-              {{ totalStudents }}
-            </v-card-subtitle>
-          </v-card-item>
-        </v-card>
-      </v-col>
-
-      <!-- Card 2: Status Online -->
-      <v-col cols="12" sm="6" md="3">
-        <v-card elevation="2" class="dashboard-card">
-          <v-card-item>
-            <template #prepend>
-              <v-avatar color="success" size="48">
-                <v-icon icon="mdi-check-circle"></v-icon>
-              </v-avatar>
-            </template>
-
-            <v-card-title>Status</v-card-title>
-            <v-card-subtitle class="text-h6 font-weight-bold text-success">
-              Online
-            </v-card-subtitle>
-          </v-card-item>
-        </v-card>
-      </v-col>
-
-      <!-- Card 3: Seu Email -->
       <v-col cols="12" sm="6" md="3">
         <v-card elevation="2" class="dashboard-card">
           <v-card-item>
@@ -59,14 +18,12 @@
             </template>
 
             <v-card-title>Email</v-card-title>
-            <v-card-subtitle class="text-body2 text-truncate">
-              seu.email@example.com
+            <v-card-subtitle class="text-h6 font-weight-bold text-primary">
+              {{ userEmail }}
             </v-card-subtitle>
           </v-card-item>
         </v-card>
       </v-col>
-
-      <!-- Card 4: Seu Papel -->
       <v-col cols="12" sm="6" md="3">
         <v-card elevation="2" class="dashboard-card">
           <v-card-item>
@@ -75,7 +32,6 @@
                 <v-icon icon="mdi-shield-account"></v-icon>
               </v-avatar>
             </template>
-
             <v-card-title>Seu Papel</v-card-title>
             <v-card-subtitle class="text-h6 font-weight-bold text-secondary">
               {{ userRole }}
@@ -114,29 +70,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { computed } from 'vue'
 
-/**
- * DADOS DO DASHBOARD
- */
-// Dados simulados (depois virão da API)
-const userName = ref('João Silva')
-const userEmail = ref('joao@example.com')
-const userRole = ref('Administrador')
-const totalStudents = ref(42)
-const isAdmin = ref(true) // Simulado, depois virá do authStore
+const authStore = useAuthStore()
 
-/**
- * COMPUTED PROPERTIES
- */
-// Pode adicionar lógica aqui se necessário
-const greeting = computed(() => {
-  const hour = new Date().getHours()
-  
-  if (hour < 12) return 'Bom dia'
-  if (hour < 18) return 'Boa tarde'
-  return 'Boa noite'
-})
+const userName = computed(() => authStore.user?.name || '')
+const userEmail = computed(() => authStore.user?.email || '')
+const userRole = computed(() => authStore.user?.role || '')
+
+const isAdmin = computed(() => authStore.user?.role === 'ADMIN')
+
 </script>
 
 <style scoped>

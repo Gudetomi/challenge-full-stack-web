@@ -9,12 +9,14 @@ export async function search(request: FastifyRequest, reply: FastifyReply) {
   })
   const { query, page } = searchStudentsQuerySchema.parse(request.query)
   const searchStudentsService = makeSearchStudentsService()
-  const { students } = await searchStudentsService.execute({
+  const { students ,total, page:currentPage } = await searchStudentsService.execute({
     query,
     page,
   })
 
   return reply.status(200).send({
     students,
+    total,
+    page:currentPage
   })
 }

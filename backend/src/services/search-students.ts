@@ -8,15 +8,19 @@ interface SearchStudentServiceRequest{
 
 interface SearchStudentServiceResponse{
   students: Student[];
+  total:number,
+  page:number
 }
 
 export class SearchStudentsService {
   constructor(private studentRepository: StudentsRepository){}
 
   async execute({ query, page }: SearchStudentServiceRequest): Promise<SearchStudentServiceResponse>{
-    const students = await this.studentRepository.searchMany(page, query)
+    const { students,total } = await this.studentRepository.searchMany(page, query)
     return {
-      students
+      students,
+      total,
+      page
     }
   }
 }
