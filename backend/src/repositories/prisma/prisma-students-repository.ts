@@ -22,7 +22,6 @@ export class PrismaStudentsRepository implements StudentsRepository {
   }
   async searchMany(page: number, query?: string) {
     const where: Prisma.StudentWhereInput = {}
-    console.log(query)
     if (query) {
       const sanitizedQuery = query.replace(/[.-]/g, '')
       where.OR = [
@@ -35,8 +34,8 @@ export class PrismaStudentsRepository implements StudentsRepository {
     const [students, total] = await prisma.$transaction([
       prisma.student.findMany({
         where,
-        take: 20,
-        skip: (page - 1) * 20,
+        take: 10,
+        skip: (page - 1) * 10,
         orderBy: { name: 'asc' },
       }),
       prisma.student.count({ where })

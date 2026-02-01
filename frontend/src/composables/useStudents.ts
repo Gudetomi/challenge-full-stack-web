@@ -48,7 +48,12 @@ export function useStudents() {
       formErrors.name = ''
     }
   }
-
+  function resetTable() {
+    searchInput.value = ''              // limpa o input de busca
+    studentStore.currentPage = 1        // volta para a primeira página
+    studentStore.fetchStudents(1, '')   // busca sem filtro
+  }
+  
   function validateEmail() {
     if (!form.email) {
       formErrors.email = 'Email é obrigatório'
@@ -174,6 +179,7 @@ export function useStudents() {
   return {
     studentStore,
     searchInput,
+    resetTable,
     dialogOpen,
     deleteDialogOpen,
     editingStudent,

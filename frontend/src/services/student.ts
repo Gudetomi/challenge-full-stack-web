@@ -37,14 +37,14 @@ class StudentService {
   async listStudents(params?: {
     page?: number
     limit?: number
-    search?: string
+    query?: string
   }) {
     try {
       const response = await api.get<StudentResponse>(this.baseUrl, {
         params: {
           page: params?.page || 1,
           limit: params?.limit || 10,
-          search: params?.search || '',
+          query: params?.query || '',
         },
       })
       return response

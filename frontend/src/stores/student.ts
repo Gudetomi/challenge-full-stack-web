@@ -18,7 +18,7 @@ export const useStudentStore = defineStore('student', () => {
   const errorMessage = computed(() => error.value)
   const totalPages = computed(() => Math.ceil(totalStudents.value / pageSize.value))
 
-  async function fetchStudents(page?: number, search?: string) {
+  async function fetchStudents(page?: number, query?: string) {
     loading.value = true
     error.value = null
   
@@ -26,7 +26,7 @@ export const useStudentStore = defineStore('student', () => {
       const response = await studentService.listStudents({
         page: page || currentPage.value,
         limit: pageSize.value,
-        search: search ?? searchQuery.value,
+        query: query ?? searchQuery.value,
       })
   
       const data = response.data.students
@@ -34,7 +34,7 @@ export const useStudentStore = defineStore('student', () => {
       students.value = Array.isArray(data) ? data : []
       totalStudents.value = response.data.total ?? students.value.length
       currentPage.value = page || currentPage.value
-      searchQuery.value = search ?? searchQuery.value // mantém o termo de busca atual
+      searchQuery.value = query ?? searchQuery.value
   
     } catch (err: any) {
       error.value = err.message || 'Erro ao carregar alunos'

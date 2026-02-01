@@ -11,8 +11,22 @@
         </div>
       </v-col>
     </v-row>
-    <v-text-field v-model="searchInput" label="Buscar aluno..." prepend-inner-icon="mdi-magnify" variant="outlined"
-      density="comfortable" clearable @input="handleSearch" />
+    <v-text-field
+    v-model="searchInput"
+    label="Buscar aluno..."
+    prepend-inner-icon="mdi-magnify"
+    variant="outlined"
+    density="comfortable"
+    clearable
+    @keyup.enter="handleSearch"
+    @click:clear="resetTable"
+    >
+    <template #append-inner>
+      <v-btn small color="primary" @click="handleSearch">
+        Buscar
+      </v-btn>
+    </template>
+    </v-text-field>
     <v-row v-if="studentStore.hasError" class="mb-6">
       <v-col cols="12">
         <v-alert type="error" variant="tonal" closable @click:close="studentStore.clearError">
@@ -31,16 +45,16 @@
                 {{ item.email }}
               </a>
             </template>
-            <template #item.actions="{ item }">
-              <div class="d-flex gap-2">
-                <v-btn icon color="warning" @click="openEditDialog(item)">
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn icon color="error" @click="openDeleteDialog(item)">
-                  <v-icon>mdi-trash-can</v-icon>
-                </v-btn>
-              </div>
-            </template>
+          <template #item.actions="{ item }">
+            <v-row class="justify-center" no-gutters>
+              <v-btn icon color="warning" @click="openEditDialog(item)">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn icon color="error" @click="openDeleteDialog(item)">
+                <v-icon>mdi-trash-can</v-icon>
+              </v-btn>
+            </v-row>
+          </template>
           </v-data-table>
           <v-pagination v-model="studentStore.currentPage" :length="studentStore.totalPages"
             @update:model-value="handlePageChange" class="pa-4" />
@@ -117,6 +131,7 @@
 import { useStudents } from '@/composables/useStudents';
 const {
   studentStore,
+  resetTable,
   searchInput,
   dialogOpen,
   deleteDialogOpen,
