@@ -234,8 +234,9 @@ Gerencia variáveis de ambiente com validação Zod.
 Localizadas em `prisma/migrations/` para controle de versão do schema.
 
 #### Seed:
-`prisma/seed.ts` - Dados iniciais para desenvolvimento (executar com `npx prisma db seed`).
+`prisma/seed.ts` - Dados iniciais (Admin/Member).
 
+**Automação:** Executado automaticamente ao rodar `npm run start:dev` para garantir consistência no ambiente de desenvolvimento.
 ---
 
 ## 🔐 Autenticação e Autorização
@@ -380,10 +381,18 @@ npx prisma migrate dev
 ### Iniciar servidor:
 
 ```bash
-npm run start:dev  # Desenvolvimento (com hot reload)
+npm run start:dev  # O comando já gera o client, executa o seed e sobe o servidor
 npm run start      # Produção (build obrigatório)
 npm run build      # Compilar TypeScript
 ```
+### 👤 Credenciais de Teste (Seed)
+
+Após rodar o `npm run start:dev`, utilize os seguintes acessos:
+
+| Perfil | E-mail | Senha | Permissões |
+|--------|--------|-------|
+| **Admin** | admin@email.com| 123456 | Acesso total (CRUD de Alunos e Comentários) |
+| **Member** | member@email.com | 123456 | Acesso limitado 
 
 ### Acessar documentação:
 
@@ -395,7 +404,7 @@ Abra [http://localhost:3333/docs](http://localhost:3333/docs)
 
 | Comando | Descrição |
 |---------|-----------|
-| `npm run start:dev` | Inicia servidor em modo desenvolvimento com reload automático |
+| `npm run start:dev` | Ambiente completo: Gera o Prisma Client, popula o banco (Seed) e inicia o servidor com hot-reload |
 | `npm run start` | Inicia servidor de produção |
 | `npm run build` | Compila TypeScript para JavaScript |
 | `npm run test` | Executa testes unitários |
