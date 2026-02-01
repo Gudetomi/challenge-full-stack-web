@@ -13,10 +13,9 @@ export async function create(request: FastifyRequest, reply: FastifyReply){
       .transform(val => val.replace(/\D/g, ''))
       .refine(val => val.length === 11, 'CPF deve ter 11 dígitos')
       .refine(validateCPF, 'CPF inválido'),
-      userId: z.string(),
   })
-
-  const { name, email, ra, cpf, userId } = createStudentBodySchema.parse(request.body)
+  const userId = request.user.sub
+  const { name, email, ra, cpf } = createStudentBodySchema.parse(request.body)
   try {
     // dependency inversion principle
     const createStudentService = makeCreateStudentService()
