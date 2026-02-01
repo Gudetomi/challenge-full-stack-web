@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/styles/StudentPage.module.scss';
+import '@/assets/styles/StudentPage.scss';
 import { useStudents } from '@/composables/useStudents';
 const {
   studentStore,
