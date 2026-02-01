@@ -1,0 +1,13 @@
+.register-container {
+  background: linear-gradient(135deg, #f04e4e 0%, #0b87a9 100%);
+  min-height: 100vh;
+}
+
+.register-card {
+  border-radius: 16px;
+  border: none;
+}
+
+:deep(a) {
+  text-decoration: none;
+}

@@ -7,20 +7,28 @@ export function useUserValidation() {
   }>({})
 
   function validateEmail(email: string) {
-    if (!email) return 'Email é obrigatório'
-    if (!email.includes('@')) return 'Email inválido'
-    return ''
+    if (!email) {
+      errors.email = 'Email é obrigatório'
+    } else if (!email.includes('@')) {
+      errors.email = 'Email inválido'
+    } else {
+      errors.email = ''
+    }
   }
 
   function validatePassword(password: string) {
-    if (!password) return 'Senha é obrigatória'
-    if (password.length < 6) return 'Senha muito curta'
-    return ''
+    if (!password) {
+      errors.password = 'Senha é obrigatória'
+    } else if (password.length < 6) {
+      errors.password = 'Senha muito curta'
+    } else {
+      errors.password = ''
+    }
   }
 
   function resetErrors() {
-    errors.email = undefined
-    errors.password = undefined
+    errors.email = ''
+    errors.password = ''
   }
 
   return {

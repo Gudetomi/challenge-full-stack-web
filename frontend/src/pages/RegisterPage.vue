@@ -56,8 +56,8 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/styles/Register.scss';
 import { useRegister } from "@/composables/useRegister";
-
 const {
   form,
   showPassword,
@@ -75,19 +75,3 @@ const {
 } = useRegister()
 
 </script>
-
-<style scoped>
-.register-container {
-  background: linear-gradient(135deg, #f04e4e 0%, #0b87a9 100%);
-  min-height: 100vh;
-}
-
-.register-card {
-  border-radius: 16px;
-  border: none;
-}
-
-:deep(a) {
-  text-decoration: none;
-}
-</style>

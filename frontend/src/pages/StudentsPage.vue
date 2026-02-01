@@ -128,6 +128,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/styles/StudentPage.module.scss';
 import { useStudents } from '@/composables/useStudents';
 const {
   studentStore,
@@ -163,34 +164,3 @@ const headers = [
   { title: 'Ações', key: 'actions', align: 'center', width: '15%', sortable: false },
 ]
 </script>
-
-<style scoped>
-.students-table {
-  border-radius: 8px;
-}
-
-:deep(.v-data-table) {
-  background: transparent;
-}
-
-:deep(.v-data-table__tr) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-:deep(.v-data-table__tr:hover) {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-:deep(a) {
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-:deep(a:hover) {
-  text-decoration: underline;
-}
-
-.gap-2 {
-  gap: 8px;
-}
-</style>

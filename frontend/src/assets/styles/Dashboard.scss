@@ -1,0 +1,46 @@
+.dashboard-card {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.action-card {
+  background: linear-gradient(135deg, rgba(51, 102, 204, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(51, 102, 204, 0.1);
+}
+
+.gap-3 {
+  gap: 12px;
+}

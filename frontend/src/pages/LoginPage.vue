@@ -27,32 +27,32 @@
       <v-card-text>
         <v-form @submit.prevent="handleLogin">
           <v-text-field
-            v-model="email"
-            label="Email"
-            type="email"
-            prepend-inner-icon="mdi-email"
-            variant="outlined"
-            density="comfortable"
-            class="mb-4"
-            :error="!!errors.email"
-            :error-messages="errors.email ? [errors.email] : []"
-            @blur="validateEmail"
-          />
+  v-model="email"
+  label="Email"
+  type="email"
+  prepend-inner-icon="mdi-email"
+  variant="outlined"
+  density="comfortable"
+  class="mb-4"
+  :error="!!errors.email"
+  :error-messages="errors.email ? [errors.email] : []"
+  @blur="handleEmailBlur"
+/>
 
-          <v-text-field
-            v-model="password"
-            label="Senha"
-            :type="showPassword ? 'text' : 'password'"
-            prepend-inner-icon="mdi-lock"
-            :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-            variant="outlined"
-            density="comfortable"
-            class="mb-2"
-            :error="!!errors.password"
-            :error-messages="errors.password ? [errors.password] : []"
-            @blur="validatePassword"
-            @click:append-inner="showPassword = !showPassword"
-          />
+<v-text-field
+  v-model="password"
+  label="Senha"
+  :type="showPassword ? 'text' : 'password'"
+  prepend-inner-icon="mdi-lock"
+  :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+  variant="outlined"
+  density="comfortable"
+  class="mb-2"
+  :error="!!errors.password"
+  :error-messages="errors.password ? [errors.password] : []"
+  @blur="handlePasswordBlur"
+  @click:append-inner="showPassword = !showPassword"
+/>
 
           <v-btn
             block
@@ -100,22 +100,26 @@ import { computed, ref } from 'vue'
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
-const { errors, validateEmail:validateEmailFn, validatePassword } = useUserValidation()
+
+const { errors, validateEmail, validatePassword, resetErrors } = useUserValidation()
 const { login, loading, error: errorMessage } = useUserLogin()
 
 const isFormValid = computed(() => {
-  return (
-    email.value &&
-    password.value &&
-    !errors.email &&
-    !errors.password
-  )
+  return email.value && password.value && !errors.email && !errors.password
 })
-function validateEmail() {
-  errors.email = validateEmailFn(email.value)
+
+// funções do formulário
+function handleEmailBlur() {
+  validateEmail(email.value)
 }
+
+function handlePasswordBlur() {
+  validatePassword(password.value)
+}
+
 async function handleLogin() {
-  validateEmail()
+  resetErrors()
+  validateEmail(email.value)
   validatePassword(password.value)
 
   if (!isFormValid.value) return
