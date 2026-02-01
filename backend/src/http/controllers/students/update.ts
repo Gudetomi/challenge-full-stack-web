@@ -8,7 +8,7 @@ export async function updateStudent(
   reply: FastifyReply,
 ) {
   const paramsSchema = z.object({
-    id: z.string().uuid(), // Ajustado para 'id' para bater com a rota /students/:id
+    id: z.string().uuid(),
   })
 
   const bodySchema = z.object({
@@ -16,7 +16,6 @@ export async function updateStudent(
     email: z.string().email().optional(),
   })
 
-  // Se o Zod falhar aqui, o Fastify/Zod já retorna 400 automaticamente
   const { id } = paramsSchema.parse(request.params)
   const { name, email } = bodySchema.parse(request.body)
 

@@ -9,7 +9,7 @@
     >
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-app-bar-title class="text-h6 font-weight-bold">
-        Alunos Manager
+        Challenge FullStack Web
       </v-app-bar-title>
       <v-spacer></v-spacer>
       <v-menu offset-y>

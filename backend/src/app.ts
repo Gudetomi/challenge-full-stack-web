@@ -7,12 +7,17 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastify from 'fastify';
 import { ZodError } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
 import { env } from './env';
 
-
+import {
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler
+} from 'fastify-type-provider-zod';
 
 export const app = fastify()
+app.setValidatorCompiler(validatorCompiler)
+app.setSerializerCompiler(serializerCompiler)
 app.register(fastifyCookie)
 
 app.register(fastifyCors, {
@@ -37,8 +42,7 @@ app.register(fastifyJwt,{
 app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: 'API Alunos - Challenge Full Stack',
-      description: 'Documentação do sistema de gerenciamento de alunos.',
+      title: 'API Alunos',
       version: '1.0.0',
     },
     components: {
@@ -51,19 +55,7 @@ app.register(fastifySwagger, {
       },
     },
   },
-  transform: ({ schema, url }) => {
-    if (!schema) return { schema, url }
-  
-    const { params, body, querystring, response, ...rest } = schema as any
-    const transformed: any = { ...rest }
-  
-    if (params) transformed.params = zodToJsonSchema(params)
-    if (body) transformed.body = zodToJsonSchema(body)
-    if (querystring) transformed.querystring = zodToJsonSchema(querystring)
-    if (response) transformed.response = zodToJsonSchema(response)
-  
-    return { schema: transformed, url }
-  },
+  transform: jsonSchemaTransform, // <- Use isso em vez da sua função manual
 })
 
 app.register(fastifySwaggerUi, {

@@ -11,21 +11,13 @@
         </div>
       </v-col>
     </v-row>
-    <v-text-field
-    v-model="searchInput"
-    label="Buscar aluno..."
-    prepend-inner-icon="mdi-magnify"
-    variant="outlined"
-    density="comfortable"
-    clearable
-    @keyup.enter="handleSearch"
-    @click:clear="resetTable"
-    >
-    <template #append-inner>
-      <v-btn small color="primary" @click="handleSearch">
-        Buscar
-      </v-btn>
-    </template>
+    <v-text-field v-model="searchInput" label="Buscar aluno..." prepend-inner-icon="mdi-magnify" variant="outlined"
+      density="comfortable" clearable @keyup.enter="handleSearch" @click:clear="resetTable">
+      <template #append-inner>
+        <v-btn small color="primary" @click="handleSearch">
+          Buscar
+        </v-btn>
+      </template>
     </v-text-field>
     <v-row v-if="studentStore.hasError" class="mb-6">
       <v-col cols="12">
@@ -39,22 +31,22 @@
         <v-card elevation="2">
           <v-progress-linear v-if="studentStore.isLoading" indeterminate color="primary"></v-progress-linear>
           <v-data-table :headers="headers" :items="studentStore.students" :loading="studentStore.isLoading"
-            :items-per-page="studentStore.pageSize" class="students-table">
+            :items-per-page="studentStore.pageSize" hide-default-footer class="students-table">
             <template #item.email="{ item }">
               <a :href="`mailto:${item.email}`" class="text-primary">
                 {{ item.email }}
               </a>
             </template>
-          <template #item.actions="{ item }">
-            <v-row class="justify-center" no-gutters>
-              <v-btn icon color="warning" @click="openEditDialog(item)">
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn icon color="error" @click="openDeleteDialog(item)">
-                <v-icon>mdi-trash-can</v-icon>
-              </v-btn>
-            </v-row>
-          </template>
+            <template #item.actions="{ item }">
+              <v-row class="justify-center" no-gutters>
+                <v-btn icon color="warning" @click="openEditDialog(item)" density="comfortable" class="me-2">
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn icon color="error" @click="openDeleteDialog(item)" density="comfortable" class="me-2">
+                  <v-icon>mdi-trash-can</v-icon>
+                </v-btn>
+              </v-row>
+            </template>
           </v-data-table>
           <v-pagination v-model="studentStore.currentPage" :length="studentStore.totalPages"
             @update:model-value="handlePageChange" class="pa-4" />
@@ -65,11 +57,8 @@
       <v-card>
         <v-card-title>{{ editingStudent ? 'Editar Aluno' : 'Novo Aluno' }}</v-card-title>
         <v-card-text>
-          <StudentForm 
-            :initialData="editingStudent" 
-            @update:modelValue="handleFormUpdate"
-          />
-          
+          <StudentForm :initialData="editingStudent" @update:modelValue="handleFormUpdate" />
+
           <v-alert v-if="submitError" type="error" class="mt-4">{{ submitError }}</v-alert>
         </v-card-text>
         <v-card-actions>
@@ -123,7 +112,7 @@ const {
   studentToDelete,
   loadingSubmit,
   submitError,
-  isFormValid,        
+  isFormValid,
   handleFormUpdate,
   openCreateDialog,
   openEditDialog,

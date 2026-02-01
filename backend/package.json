@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "tsx watch src/server.ts",
+    "start:dev": "npx prisma generate && npx prisma db seed && tsx watch src/server.ts",
     "start": "node build/server.js",
     "build": "tsup src --out-dir build",
     "test": "vitest run --project unit",
@@ -49,6 +49,7 @@
     "bcryptjs": "3.0.3",
     "dotenv": "17.2.3",
     "fastify": "5.7.2",
+    "fastify-type-provider-zod": "6.1.0",
     "pg": "8.17.2",
     "zod": "4.3.6",
     "zod-to-json-schema": "3.25.1"

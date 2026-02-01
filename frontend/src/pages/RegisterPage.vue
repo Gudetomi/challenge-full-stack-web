@@ -17,22 +17,22 @@
         <v-form @submit.prevent="handleRegister">
           <v-text-field v-model="form.name" label="Nome completo" prepend-inner-icon="mdi-account" variant="outlined"
             density="comfortable" class="mb-4" :error="!!errors.name" :error-messages="errors.name ? [errors.name] : []"
-            @blur="validateName" required></v-text-field>
+            @blur="validateName" required ></v-text-field>
           <v-text-field v-model="form.email" label="Email" type="email" prepend-inner-icon="mdi-email"
             variant="outlined" density="comfortable" class="mb-4" :error="!!errors.email"
-            :error-messages="errors.email ? [errors.email] : []" @blur="validateEmail" required></v-text-field>
+            :error-messages="errors.email ? [errors.email] : []" @blur="validateEmail" required autocomplete="username"></v-text-field>
           <v-text-field v-model="form.password" label="Senha" :type="showPassword ? 'text' : 'password'"
             prepend-inner-icon="mdi-lock" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
             variant="outlined" density="comfortable" class="mb-2" :error="!!errors.password"
             :error-messages="errors.password ? [errors.password] : []" @blur="validatePassword"
-            @click:append-inner="showPassword = !showPassword" required></v-text-field>
+            @click:append-inner="showPassword = !showPassword" autocomplete="new-password" required></v-text-field>
           <v-progress-linear :model-value="passwordStrength" :color="passwordStrengthColor" class="mb-4"
             height="4"></v-progress-linear>
           <v-text-field v-model="form.confirmPassword" label="Confirmar senha"
             :type="showPassword ? 'text' : 'password'" prepend-inner-icon="mdi-lock-check" variant="outlined"
             density="comfortable" class="mb-4" :error="!!errors.confirmPassword"
             :error-messages="errors.confirmPassword ? [errors.confirmPassword] : []" @blur="validateConfirmPassword"
-            required></v-text-field>
+            required autocomplete="password"></v-text-field>
           <v-btn block size="large" color="secondary" type="submit" class="mb-4 text-none font-weight-bold"
             :loading="loading" :disabled="!isFormValid">
             Registrar
